@@ -1,0 +1,66 @@
+---
+title: "Project Proposal"
+author: "STAT 245, FA20"
+date: "Due Oct. 9, 2020 OR 5 days after partner meeting"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(ggformula)
+require(mosaic)
+```
+
+# General Instructions
+Create a shared RStudio project for your group (instructions in class on Friday 9/25). Make sure it is shared with Prof DR. Prepare your proposal in the form of an R Markdown document, and save it within your project. **You do not need to submit the proposal anywhere - simply make sure it's saved in your R project and I will review it there.**
+
+The document should have one section for each question below. Your answers need not be long - the average proposal will probably be 1-2 pages in total. The goal is not to go into great detail, but to touch on all the key areas you need to plan. You can come back to this proposal throughout the project to gauge your progress, and revise *the proposal* or *what you are doing* as needed.
+
+# Questions to answer
+
+## 1. Project Partner
+Our project partner is the United Methodist Community House and Michelle A. Cossar is a director of Child Programs there. The main mission of United Methodist Community House is "Increasing the ability of children, youth, adults, and families to succeed in a diverse community." This organization existed since 1902 and with the heart to serve a diverse population, they are thriving to meet the needs and offering opportunities to children, youth, adults, seniors, and families. Their core values includes faith, love, integrity, teamwork, and excellence. 
+
+## 2. Goals and Deliverables
+Questions to answer:  
+- Which domain in the areas of development is scored the lowest and highest in which age group and overall?  
+- How many children scored below the average and how many scored above the average?  
+- Is there any significant differences in the areas of development depending on genders and how long the children have been in the system?  
+
+Audience:
+- Michelle A. Cossar (our project partner)
+- Other teachers at UMCH
+
+Materials to produce:  
+- Excel file of the data  
+- An analysis-ready version of the dataset  
+- A presentation with graphics, tables, and statistical model conclusions  
+
+## 3. Data
+Michelle is collecting data at the moment. She has teachers doing testing on the students recently. We do not have it yet, but are hoping to have it by the latest at Friday September 16th. Michelle is collecting hard copy of the tests which she will scan and email to us along with any other information we need with the children's names whited out. We will then tidy up the data and make an excel spreadsheet file for our analysis. 
+
+## 4. Data Prep
+We will need to put data into spreadsheet that can then be put into r. As of right now all the data is on individual papers, one for each kid. By us organizing data into spreadsheet we are able to rename columns and rows as we go. We are not exactly sure how much change in variable names needs to occur until we get the data.
+
+## 5. Background  
+- TED talk by Tom Weisner: What is the most important influence on child development?  
+  https://www.youtube.com/watch?v=gIZ8PkLMMUo&ab_channel=TEDxTalks  
+- Brigance Early Childhood Sampler 2019
+  https://www.curriculumassociates.com/-/media/mainsite/files/brigance/brigance-early-childhood-sampler-2019-brochure.pdf
+- Impacts of a Prekindergarten Program on Children's Mathematics, Language, Literacy, Executive Function, and Emotional Skills
+https://srcd.onlinelibrary.wiley.com/doi/full/10.1111/cdev.12099
+- Child Development and Early Learning
+https://www.newamerica.org/in-depth/transforming-early-education-workforce/child-development-and-early-learning/
+
+## 6. Current Skills 
+Boyoung Jung: communication, detail-oriented, Excel, Tableau, Java, Python, SQL  
+Enoch Mwesigwa: C#, Python, Data Manipulation, SQL, Javascript, ML models
+Jordan Severn: organization, determination, Access, Excel  
+
+## 7. Work plan
+We are planning to divide the work and hold meetings regularly if anything comes up or reporting progress. I think we will meet mostly to report rather than work together but both are possible options. Tuesday’s after 4:30 are the best option for us to meet together outside of class besides the weekend. 
+
+## 8. Requests
+Encouragements are appreciated :)
