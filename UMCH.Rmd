@@ -1,0 +1,46 @@
+---
+title: "UMCH"
+author: "Cora Boyoung Jung, Enoch Mwesigwa, Jordan Severn"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  pdf_document:
+    fig_height: 2.2
+    fig_width: 4
+---
+
+```{r setup, include=FALSE}
+require(mosaic)
+require(ggformula)
+require(tidyverse)
+require(s245)
+require(DHARMa)
+knitr::opts_chunk$set(echo = TRUE, 
+                      error = TRUE,
+                      message = FALSE,
+                      fig.width = 8, fig.height = 4)
+
+theme_set(theme_minimal(base_size = 12))
+```
+
+## Import csv & Change data type
+```{r}
+UMCHdata <- read_csv("/home/bj29/UMCH/data/UMCH.csv", 
+                 col_types = cols(Birthdate = col_date(format = "%m/%d/%Y"), 
+                                  AgeYear = col_integer(), 
+                                  AgeMonth = col_integer(), 
+                                  AgeDay = col_integer()))
+
+glimpse(UMCHdata)
+```
+
+## Tidying data
+```{r}
+UMCH <- UMCHdata %>% mutate(Status = tolower(Status))
+```
+
+## Exploring data set
+```{r}
+head(UMCH)
+summary(UMCH)
+```
+
