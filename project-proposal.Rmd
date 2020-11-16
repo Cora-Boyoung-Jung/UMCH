@@ -25,9 +25,9 @@ Our project partner is the United Methodist Community House and Michelle A. Coss
 
 ## 2. Goals and Deliverables
 Questions to answer:  
-- Which domain in the areas of development is scored the lowest and highest in which age group and overall?  
-- Was the examinor/teacher a factor in the child's performance on the evaluation?  
-- Is there any significant differences in the areas of development depending on genders and how long the children have been in the system?  
+- Which domain in the areas of development is scored the lowest in which age group? 
+- Which domain in the areas of development is scored the highest in which age group?
+- Which domain in the areas of development is scored the highest and the lowest overall?
 
 Audience:
 Our audience is Michelle A. Cossar (our project partner) and the other teachers at UMCH. Our goal is to develop some useful graphics and meaningful conclusions all to provide actionable information for our project partner. 
@@ -36,6 +36,7 @@ Materials to produce:
 - Excel file of the data  
 - An analysis-ready version of the dataset  
 - A presentation with graphics, tables, and statistical model conclusions  
+
 
 ## 3. Data
 Michelle is collecting data at the moment. She has teachers doing testing on the students recently. We do not have it yet, but are hoping to have it by the latest at Friday September 16th. Michelle is collecting hard copy of the tests which she will scan and email to us along with any other information we need with the children's names whited out. We will then tidy up the data and make an excel spreadsheet file for our analysis.
@@ -58,6 +59,7 @@ https://www.newamerica.org/in-depth/transforming-early-education-workforce/child
 Boyoung Jung: communication, detail-oriented, Excel, Tableau, Java, Python, SQL  
 Enoch Mwesigwa: C#, Python, Data Manipulation, SQL, Javascript, ML models
 Jordan Severn: organization, determination, Access, Excel  
+
 ## 7. Work plan
 We are planning to divide the work and hold meetings regularly if anything comes up or reporting progress. I think we will meet mostly to report rather than work together but both are possible options. Tuesday’s after 4:30 are the best option for us to meet together outside of class besides the weekend. 
 
