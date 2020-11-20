@@ -24,7 +24,7 @@ theme_set(theme_minimal(base_size = 12))
 
 ## Import csv & Change data type
   
-```{r}
+
 UMCHdata <- read_csv("https://raw.githubusercontent.com/Cora-Boyoung-Jung/UMCH/main/data/UMCH.csv", 
                  col_types = cols(Birthdate = col_date(format = "%m/%d/%Y"), 
                                   AgeYear = col_integer(), 
@@ -32,7 +32,14 @@ UMCHdata <- read_csv("https://raw.githubusercontent.com/Cora-Boyoung-Jung/UMCH/m
                                   AgeDay = col_integer()))
 
 glimpse(UMCHdata)
+
+```{r}
+UMCHdata <- read_csv("data/UMCH.csv",
+                     col_types = cols(Birthdate = col_date(format = "%m/%d/%Y"),
+                                      Age = col_integer()))
+glimpse(UMCHdata)
 ```
+
 
 ## Tidying data
   
@@ -118,7 +125,8 @@ Regression model: Linear regression
 
 We chose TotalScore as our response variable and Age and Gender as our predictor variable because we want to know whether the Age and Gender have effect on the TotalScore. We chose linear regression model because it is used to show or predict the relationship between two variables where the response variable is continuous. We can use up to 2 predictors given the size of the data set (33/15). We will not add any interaction or random effect due to the size of our dataset.   
   
---- sample r code for alternative model ----  
+```{r}
 mod_alt <- lm(TotalScore ~ Age + Gender,  
           data = UMCH)  
 summary(mod_alt)  
+```
