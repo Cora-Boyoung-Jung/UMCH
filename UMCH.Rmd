@@ -76,16 +76,16 @@ gf_histogram(~TotalScore, data=UMCH, fill="blue", color='black') %>%
 
 ## Draft Models
 
+For all models, we used linear regression model because it is used to show/predict the relationship between variables where the response variable is continuous. We can use up to 2 predictors given the size of the data (36/15). We will not add any interaction or random effect due to the size of the dataset. Our predictors will be Age and Gender because all other variables contributes to the Total Score which does not make logical sense to include those.     
+
 ### Model Predicting PhysicalDevelopment  
    
 Response variable: PhysicalDevelopment  
-Predictor(s): LanguageDevelopment, TotalScore   
+Predictor(s): Age, Gender   
 Regression model: Linear regression  
 
-This model will show if there is a relationship between the Language Development and Physical Development of the child. We chose these two because all the age groups are graded on that category. In this first model, Physical development is the response variable. We also chose to add TotalScore to see if knowing how well the child did on the whole exam would help the prediction. This is a linear model because the response variable is continuous. We can use up to 2 predictors given the size of the data set (33/15). We will not add any interaction or random effect due to the size of our dataset.  If it was larger, it would be interesting to explore the interaction between Language Development and Status. Perhaps whether or not a student passed affect the degree of which Language development can impact physical development. The same could be explored for the interaction between Language Development and Age group. But we may be able to get some insight into those with our prediction plots.
-
 ```{r}
-mod_phy <- lm(PhysicalDevelopment ~ TotalScore + LanguageDevelopment, 
+mod_phy <- lm(PhysicalDevelopment ~ Age + Gender, 
           data = UMCH)
 
 summary(mod_phy)
@@ -97,25 +97,19 @@ Response variable: LanguageDevelopment
 Predictor(s): PhysicalDevelopment, TotalScore   
 Regression model: Linear regression  
 
-This model will show if there is a relationship between the Language Development and Physical Development of the child. We chose these two because all the age groups are graded on that category. In this first model, Language development is the response variable. We also chose to add TotalScore to see if knowing how well the child did on the whole exam would help the prediction. This is a linear model because the response variable is continuous. We can use up to 2 predictors given the size of the data set (33/15). We will not add any interaction or random effect due to the size of our dataset.  
-
 ```{r}
-mod_lan <- lm(LanguageDevelopment ~ TotalScore + PhysicalDevelopment, 
+mod_lan <- lm(LanguageDevelopment ~ Age + Gender, 
           data = UMCH)
 
 summary(mod_lan)
 ```
 
-### Alternative Model  
+### TotalScore Model  
     
-This is another alternative model we are thinking after we receive "Gender" information on the children next week. 
-
 Response variable: TotalScore 
 Predictor(s): Age, Gender   
 Regression model: Linear regression 
 
-We chose TotalScore as our response variable and Age and Gender as our predictor variable because we want to know whether the Age and Gender have effect on the TotalScore. We chose linear regression model because it is used to show or predict the relationship between two variables where the response variable is continuous. We can use up to 2 predictors given the size of the data set (33/15). We will not add any interaction or random effect due to the size of our dataset.   
-  
 ```{r}
 mod_alt <- lm(TotalScore ~ Age + Gender,  
           data = UMCH)  
