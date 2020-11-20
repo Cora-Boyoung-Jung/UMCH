@@ -25,20 +25,11 @@ theme_set(theme_minimal(base_size = 12))
 ## Import csv & Change data type
   
 ```{r}
-UMCHdata <- read_csv("data/UMCH.csv",
-                     col_types = cols(Birthdate = col_date(format = "%m/%d/%Y"),
-                                      Age = col_integer()))
-glimpse(UMCHdata)
-```
-
-
 UMCHdata <- read_csv("https://raw.githubusercontent.com/Cora-Boyoung-Jung/UMCH/main/data/UMCH.csv",
                      col_types = cols(Birthdate = col_date(format = "%m/%d/%Y"),
                                       Age = col_integer()))
 glimpse(UMCHdata)
-
-
-
+```
 ## Tidying data
   
 ```{r}
