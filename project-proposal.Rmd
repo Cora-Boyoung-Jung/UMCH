@@ -28,6 +28,8 @@ Questions to answer:
 - Which domain in the areas of development is scored the lowest in which age group? 
 - Which domain in the areas of development is scored the highest in which age group?
 - Which domain in the areas of development is scored the highest and the lowest overall?
+- Do Age and Gender have effect on the development skills of a child?  
+- Do Age and Gender have effect on the development of a child? If so, in which domain?  
 
 Audience:
 Our audience is Michelle A. Cossar (our project partner) and the other teachers at UMCH. Our goal is to develop some useful graphics and meaningful conclusions all to provide actionable information for our project partner. 
