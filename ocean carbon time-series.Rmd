@@ -1,0 +1,201 @@
+---
+title: "Ocean Carbon Time-Series"
+author: "STAT 245 Fall 2020"
+date: "11/23/2020"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+require(tidyverse)
+require(mosaic)
+require(ggformula)
+require(mgcv)
+require(s245)
+require(DHARMa)
+require(ggeffects)
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+theme_set(theme_minimal(base_size = 14))
+```
+
+## Roles
+
+Make sure your group identifies an:
+
+- R coder/typist and screen-sharer
+- Chat message sender
+- Manager/spokesperson
+
+## Data
+
+Data are from the [Scripps Institution of Oceanography $CO_2$  Program](https://scrippsco2.ucsd.edu/data/seawater_carbon/ocean_time_series.html).  We will model the total dissolved inorganic carbon (`DIC`) in sea water over time at three observation `Station`s, and as a function of `Depth,`, `Salinity`, and `Temp`erature.
+
+First, have a look at the data:
+
+```{r, message = FALSE}
+BATS <- read_csv('https://scrippsco2.ucsd.edu/assets/data/seawater/BATS.csv',
+                 skip = 34) %>%
+  slice(-1)
+BERM <- read_csv('https://scrippsco2.ucsd.edu/assets/data/seawater/BERM.csv',
+                 skip = 34) %>%
+  slice(-1)
+HOTS <- read_csv('https://scrippsco2.ucsd.edu/assets/data/seawater/HAWI.csv',
+                 skip = 34) %>%
+  slice(-1)
+ocean_water <- bind_rows(BATS, BERM, HOTS)
+glimpse(ocean_water)
+
+ocean_water <- ocean_water %>%
+  mutate(Decimal = parse_number(Decimal),
+         Station = factor(Station),
+         Sample = lubridate::ymd(Sample),
+         Month = lubridate::month(Sample))
+```
+
+```{r}
+gf_line(DIC ~ Decimal, 
+        color = ~ Station,
+        data = ocean_water)
+
+gf_point(DIC ~ Month | Station,
+        color = ~Decimal,
+        data = ocean_water)
+
+gf_point(DIC ~ Temp, data = ocean_water,
+         color = ~Station)
+
+gf_point(DIC ~ Depth, data = ocean_water,
+         color = ~Station)
+
+gf_point(DIC ~ Salinity, data = ocean_water,
+         color = ~Station)
+```
+
+**Q1 (send answer via chat): Very briefly, what patterns do you see in the data? Anything nonlinear? Interactions?**
+Figure 1. BATS and BERM seems to be very similar except for the peak of green that goes all the way to DIC = 2300.
+Figure 2. Again BATS and BERM seems to be similar again and HAWI definitely has lower DIC. Nonlinear trend for all.
+Figure 3. BATS AND BERM seem to have a linear trend with DIC and Temp while HAWI is clustered in 22 - 27. 
+Figure 4. CONFUSING
+Figure 5. Similar shape for all but different salinity range for HAWI.
+
+## Model
+
+dic_gam <- gam(DIC ~ Station + 
+                 s(Decimal, by = Station, bs = 'ts', k = 8) +
+                 s(Month, by = Station, bs = 'cp', k = 5) +
+                 s(Depth, by = Station, bs = 'ts', k = 5) + Temp + Salinity,
+               select = TRUE,
+               method = 'ML',
+               data = ocean_water)
+
+summary(dic_gam)
+
+
+```{r}
+dic_gam <- gam(DIC ~ Station + 
+                 s(Decimal, by = Station, bs = 'ts', k = 8) +
+                 s(Month, by = Station, bs = 'ts', k = 5) +
+                 s(Temp, by = Station, bs = 'ts', k = 5) + 
+                 s(Salinity, by = Station, bs = 'ts', k = 5) +
+                 s(Depth, by = Station, bs = 'ts', k = 5),
+               select = TRUE,
+               method = 'ML',
+               data = ocean_water)
+
+summary(dic_gam)
+```
+
+**Q2 (send answer via chat): Which if any of my planning choices do you question? Make any changes that you want and notice if you see any major changes in the summary. But don't remove the `by = ...` from the smooths please.**
+We question whether Temp and Salinity should be smoothened or not, so we added them as normal predictors and there were major changes with the coefficient numbers.  
+
+
+## Assessment
+
+```{r}
+gf_point(resid(dic_gam) ~ fitted(dic_gam),
+         alpha = 0.4)
+gf_dhistogram(~resid(dic_gam))
+gf_qq(~resid(dic_gam)) %>% gf_qqline()
+gf_acf(~dic_gam)
+```
+
+**Q3 (send answer via chat): Which (one) condition do you think has the most serious issue?**
+Independence of residual
+
+## A Fix
+The model below fixed this problem.  
+
+**Q4 (via chat): What differences do you notice in the code, and results (summary, assessment) below? Can you tell it "worked"? (It did...believe it or not...why are you perhaps skeptical?)**
+We are skeptical because the acf plot looks worse in our eyes. 
+
+```{r}
+# be patient running this:
+dic_gam2 <- gamm(DIC ~ s(Decimal, by = Station, bs = 'ts', k = 8) +
+                 s(Month, by = Station, bs = 'ts', k = 5) +
+                 s(Temp, by = Station, bs = 'ts', k = 5) + 
+                 s(Salinity, by = Station, bs = 'ts', k = 5) +
+                 s(Depth, by = Station, bs = 'ts', k = 5),
+               select = TRUE,
+               correlation = corAR1(form = ~1 | Station),
+               method = 'ML',
+               data = ocean_water)
+
+# and in case of a crash skip it and use code below to load in pre-fitted version:
+dic_gam2 <- readRDS(url('https://sldr.netlify.app/data/dic_gam2.RDS'))
+
+# note: a fitted gamm() object is a list with two parts: output$lme and output$gam. 
+# We'll use output$gam.
+summary(dic_gam2$gam)
+```
+
+
+### Re-Assessment
+
+```{r}
+gf_point(resid(dic_gam2$gam) ~ fitted(dic_gam2$gam),
+         alpha = 0.4)
+gf_dhistogram(~resid(dic_gam2$gam))
+gf_qq(~resid(dic_gam2$gam)) %>% gf_qqline()
+m2 <- dic_gam2$gam
+gf_acf(~m2)
+```
+
+## Predictions
+
+We can trust our new model because it's conditions are met (trust me).
+
+One prediction plot is given. Create and view the others by changing the first predictor in `terms`.
+
+**Write a few notes: How does DIC vary over time, seasonally, with temperature, salinity, and depth, and by Station?**
+DIC increases over time with HAWI being the highest but the most dynamic followed by BATS and BERM.
+
+
+```{r}
+ggpredict(dic_gam2, terms = c('Decimal', 'Station')) %>% 
+  plot()
+```
+
+Questions to check your understanding (*don't need to send answers unless you'd like feedback*):
+
+- What does the `by` input to `s()` seem to be doing? Explain in your own words. **Hint: one way to explain it is that it's an interaction between the smooth term and another categorical predictor.**
+- What seasonal patterns in DIC do you see in the data plots, and the prediction plots?
+- Why do you think that for DIC as a function of Month, the value in Hawaii (`HAWI`) is lower than Bermuda (`BERM` and `BATS`) in the data plot, and higher in the prediction plot?
+
+**This is a stopping point for group work. If you have time left, go back and:**
+
+- **Improve upon the data graphs**
+- **Try to decide if you think any of the smooths are over- or under-fitted, and if so, what you'd do to fix it.**
+
+## Recap
+
+**Don't read until you've completed the whole exercise.**
+
+*If you have time to read this before returning to the full class session, make note of (and send me?) any questions you have about it!*
+
+- The `by` input to `s()` in a `gam(m)()` lets you name a categorical predictor that interacts with the smooth term -- effectively allowing a *different smooth trend for each level* of the categorical predictor
+- If you swap out `gamm()` for `gam()` (don't do this unless needed - it is slower and less robust), you can include the input `correlation` to specify an *expected correlation structure* for the residuals.
+- Specifying a correlation structure *will not change the ACF* -- instead, it changes the *model equation* so that the correlation in the residuals is *expected*. In other words, it relaxes (stat-speak for "removes") the residual independence condition.
+- The correlation structure we used was `corAR1()`, a first-order autoregressive process. This choice makes sense for many time-series datasets. It says that each observation depends on (is similar to) the one before it. This results in an ACF that with an exponential-decay trend (like ours is).
+- The `form` input to `corAR1()` takes a formula that is reminiscent of the formula for a random effect in `glmmTMB()`. The `~1` part tells R that the correlation is along the row numbers (rows close in position are close in time). The `| Station` part says that the data from different stations are independent - the dependence is only over time, within station.

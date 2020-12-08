@@ -1,0 +1,93 @@
+---
+title: "You Control This Rmd File"
+author: "Cora Boyoung Jung, Enoch Mwesigwa, Jordan Severn"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+output: 
+  html_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+require(tidyverse)
+require(ggformula)
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(dev = c('pdf', 'png'),
+                      fig.path = 'controlled-figures/legos-')
+```
+
+## Instructions
+
+Alter each section to do as instructed.
+
+Unless explicitly told to "remove this text" you can either remove, or leave in, the text instructions within each section. 
+
+Leave the section headers undisturbed unless explicitly told to delete them.
+
+## Legos Data
+
+In this section, read in the legos dataset from <https://sldr.netlify.app/data/legos.csv> **but make sure that the code you use, and any messages it generates, do not show up in the output file.**
+
+```{r, echo = FALSE, message = FALSE}
+legos <- read_csv('https://sldr.netlify.app/data/legos.csv') %>%
+  mutate(Theme = factor(Theme),
+         Subtheme = factor(Subtheme))
+```
+
+## A Mal-Sized Figure
+
+Make one figure (any figure of your choice) using the legos dataset.
+
+Ensure that the code used to generate is **is shown** in the knitted file.
+
+Also ensure **that the figure itself is a bit too small** and **the font size used in the figure is too big, especially relative to the figure size.**
+
+```{r too-small, fig.height = 1, fig.width = 5}
+theme_set(theme_minimal(base_size = 30))
+gf_point(Price ~ Minifigures, 
+         alpha = 0.1,
+         data = legos)
+```
+
+
+## A Better Proportioned Figure
+
+Make the same figure again.
+
+But this time, make it a **reasonable size** and with a **reasonable-size** font.
+
+And this time, make sure the **code used to generate it is not shown** in the knitted file.
+
+```{r better-sized, fig.height = 3, fig.width = 5,  echo = FALSE}
+theme_set(theme_minimal(base_size = 11))
+gf_point(Price ~ Minifigures, 
+         alpha = 0.1,
+         data = legos)
+```
+
+## This is Silly
+
+Add code to create another figure in this section (your choice, but different from what you have done so far) with the lego data.
+
+But make sure **the code to make the figure is shown in the knitted file** (just shown, without commenting it out) and **the figure itself is not shown.**
+
+```{r silly, fig.show = 'hide'}
+gf_boxplot(Price ~ factor(Year), 
+         alpha = 0.1,
+         data = legos) %>%
+  gf_theme(axis.text.x = element_text(angle = 70))
+```
+
+
+## Saving Those Figs
+
+Revise your file (you'll make changes to your settings chunk) so that PDF and jpeg image files of each figure get saved to a folder called "controlled-figures" with file name prefix "legos-" (followed by the R code chunk label).
+
+Make sure the R code chunk labels (and thus the figure file names) include "too-small", "better-sized", and "silly" respectively. (You are encouraged to make the labels more informative too, like if you made a histogram of number of pieces you might label that chunk "too-small-npieces-hist".)
+
+Make sure to examine your Files tab to verify where the figures get saved and how the names work.
+
+## Ta-Da!
+
+You did it. You now control this file.
+
+If you have more time left after handing in your un-knitted Rmd file on Moodle, you may use if for project work and coordination.

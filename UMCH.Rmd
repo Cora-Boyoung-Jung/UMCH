@@ -1,23 +1,30 @@
 ---
 title: "UMCH"
 author: "Cora Boyoung Jung, Enoch Mwesigwa, Jordan Severn"
-date: '`r format(Sys.Date(), "%B %d, %Y")`'
-output: 
+date: "`r format(Sys.Date(), "%B %d, %Y")`"
+output:
   pdf_document:
+    fig_height: 2.2
+    fig_width: 4
+  html_document:
     fig_height: 2.2
     fig_width: 4
 ---
 
+
 ```{r setup, include=FALSE}
+library(plyr)  ## or dplyr (transform -> mutate) 
 require(mosaic)
 require(ggformula)
 require(tidyverse)
 require(s245)
 require(DHARMa)
+library(reticulate) # for using python
+library(reactable) #install.packages("reactable") may need to run once
 knitr::opts_chunk$set(echo = TRUE, 
                       error = TRUE,
                       message = FALSE,
-                      fig.width = 8, fig.height = 4)
+                      fig.width = 10, fig.height = 4)
 
 theme_set(theme_minimal(base_size = 12))
 ```
@@ -35,7 +42,7 @@ glimpse(UMCHdata)
 ```{r}
 UMCH <- UMCHdata %>% mutate(Status = tolower(Status))
 neworder <- c("infant","toddler","two_year", "three_year", "four_year")
-library(plyr)  ## or dplyr (transform -> mutate)
+
 UMCH <- arrange(transform(UMCH,
              AgeGroup=factor(AgeGroup,levels=neworder)),AgeGroup)
 ```
@@ -47,7 +54,9 @@ head(UMCH)
 summary(UMCH)
 ```
 
-## Draft Graphics
+
+
+## Graphics
 
 - Which domain in the areas of development is scored the lowest and highest in which age group and overall? 
 ```{r physical-agegroup}
@@ -55,55 +64,94 @@ ggplot(UMCH, aes(x = AgeGroup,  y = PhysicalDevelopment, color = Status)) +
   geom_point() +
   labs(x = "Age Group",
        y = "Physical Development Score",
-       title = "Number of Passes and Fails by Physical Development Score")
+       title = "Number of Passes and Fails by Physical Development Score") +
+  expand_limits(y = 0)
 ```
 ```{r language-by-agegroup}
 ggplot(UMCH, aes(x = AgeGroup,  y = LanguageDevelopment, color = Status)) +
   geom_point() +
   labs(x = "Age Group",
        y = "Language Development Score",
-       title = "Number of Passes and Fails by Language Development Score")
+       title = "Number of Passes and Fails by Language Development Score") +
+  expand_limits(y = 0)
 
 ```
+
 - How does score vary by age group?  
 ```{r totalscore-by-agegroup}
-gf_histogram(~TotalScore, data=UMCH, fill="blue", color='black') %>% 
+gf_histogram(~TotalScore, data=UMCH, fill='#00BFC4', color='black') %>% 
   gf_labs(title="Total Scores by Age Group", x="Total Score", y="Counts") + facet_wrap(~AgeGroup)
-
 ```
 
-## Draft Models
+- How does score vary by gender?  
+```{r totalscore-by-gender-and-agegroup}
+ggplot(UMCH, aes(x = Gender,  y = TotalScore, fill=Gender)) +
+  geom_boxplot() + 
+  facet_wrap(~AgeGroup) +
+  labs(title="Total Scores by Gender for Each AgeGroup", x="Gender") +
+  expand_limits(y = 0)
+```
 
-For all models, we used linear regression model because it is used to show/predict the relationship between variables where the response variable is continuous. We can use up to 2 predictors given the size of the data (36/15). We will not add any interaction or random effect due to the size of the dataset. Our predictors will be Age and Gender because all other variables contributes to the Total Score which does not make logical sense to include those.     
 
-### Model Predicting PhysicalDevelopment  
-   
-Response variable: PhysicalDevelopment  
-Predictor(s): Age, Gender   
-Regression model: Linear regression  
-
+## Statistics in Raw Score
 ```{r}
-mod_phy <- lm(PhysicalDevelopment ~ Age + Gender, 
-          data = UMCH)
+UMCH_long <- UMCH %>%
+  subset(select = -c(Filename, Birthdate, Age, Gender, TotalScore, Status, Examiner)) %>%
+  pivot_longer(!AgeGroup, names_to = "Domain", values_to = "Score") %>%
+  na.omit() %>%
+  mutate(AgeGroup = as.factor(AgeGroup),
+         Domain = as.factor(Domain),
+         Score = as.numeric(Score))
 
-summary(mod_phy)
+UMCH_stat <- UMCH_long %>%
+  dplyr::group_by(AgeGroup,Domain) %>%
+  dplyr::summarise(Min=min(Score),
+                   Max=max(Score),
+                   Mean=mean(Score),
+                   Median=median(Score))
+
+UMCH_stat %>%
+  knitr::kable()
 ```
 
-### Model Predicting LanguageDevelopment  
-  
-Response variable: LanguageDevelopment  
-Predictor(s): PhysicalDevelopment, TotalScore   
-Regression model: Linear regression  
-
-```{r}
-mod_lan <- lm(LanguageDevelopment ~ Age + Gender, 
-          data = UMCH)
-
-summary(mod_lan)
+```{r max}
+ggplot(UMCH_stat, aes(x = AgeGroup,  y = Max, color=Domain)) +
+  geom_point() + 
+  facet_wrap(~Domain) +
+  labs(title="Maximum Score of Children Grouped by AgeGroup and Domain", y="Score") +
+  theme(legend.position = "none") +
+  expand_limits(y = 0)
+```
+`
+```{r min}
+ggplot(UMCH_stat, aes(x = AgeGroup,  y = Min, color=Domain)) +
+  geom_point() + 
+  facet_wrap(~Domain) +
+  labs(title="Mininum Score of Children Grouped by AgeGroup and Domain", y="Score") +
+  theme(legend.position = "none") +
+  expand_limits(y = 0)
+```
+```{r mean}
+ggplot(UMCH_stat, aes(x = AgeGroup,  y = Mean, color=Domain)) +
+  geom_point() + 
+  facet_wrap(~Domain) +
+  labs(title="Average Score of Children Grouped by AgeGroup and Domain", y="Score") +
+  theme(legend.position = "none") +
+  expand_limits(y = 0)
 ```
 
-### TotalScore Model  
-    
+```{r median}
+ggplot(UMCH_stat, aes(x = Domain,  y = Median, color=AgeGroup)) +
+  geom_point() + 
+  labs(title="Median Score of Children Grouped by AgeGroup and Domain", y="Score") +
+  theme(legend.position = "none") +
+  expand_limits(y = 0)
+```
+
+
+## TotalScore Model
+
+We used linear regression model because it is used to show/predict the relationship between variables where the response variable is continuous. We can use up to 2 predictors given the size of the data (36/15). We will not add any interaction or random effect due to the size of the dataset. Our predictors will be Age and Gender because all other variables contributes to the Total Score which does not make logical sense to include those.     
 Response variable: TotalScore 
 Predictor(s): Age, Gender   
 Regression model: Linear regression 
@@ -114,9 +162,48 @@ mod_total <- lm(TotalScore ~ Age + Gender,
 summary(mod_total)  
 ```
 
-## Model Assesment
+## Model Assessment
+
+```{r linearity-and-error-variance}
+gf_point(resid(mod_total) ~ fitted(mod_total)) %>%
+  gf_labs(x = 'Fitted Values', y = 'Residuals')
+```
+
+The fitted values vs. the residual plot is used for linearity and error variance. There is no trumpeting present so it passes the error variance condition. However, there is some clustering present and the data points make vertical lines so linearity is a little more iffy on whether or not it passes. 
+
+```{r independence}
+acf(resid(mod_total))
+```
+
+Looking at the acf plot, the plot passes the independence condition. All the lines are within the dotted lines and the lag at 0 is normal. 
+
+```{r normality}
+gf_histogram(~resid(mod_total), bins = 5) %>%
+  gf_labs(x = "Residuals")
+```
+
+Since the data is limited, the bins need to be limited. The histogram passes the normality condition. 
+
+
+## Prediction Plot
+
+```{r pred-plot-age}
+pred_plot(mod_total, 'Age') %>%
+  gf_labs(y = 'Predicted Score',
+          title = 'Prediction Plot on Age')
+```
+
+```{r pred-plot-gender}
+pred_plot(mod_total, 'Gender') %>%
+  gf_labs(y = 'Predicted Score',
+          title = 'Prediction Plot on Gender')
+```
+
+According to the prediction plot for Age, there seems to be a positive trend between the score and age where as age increases, the score also increases. This makes sense because the "pass" score for each age group differs according to the age with lower age having the lowest pass score.  
+According to the prediction plot for Gender, it looks like the total score is a little higher for female compared to male. However, the overlapping range is high and the number of children is not the same (21 females and 15 males), so it brings down the reliability score of this data but it is worth noting.  
 
 
 
-## Interpretation
+
+
 

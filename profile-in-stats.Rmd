@@ -1,0 +1,48 @@
+---
+title: "Profile in Stats: Yoonkyung Lee"
+author: "Cora Boyoung Jung, Enoch Mwesigwa, Jordan Severn"
+date: "12/1/2020"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Who is Yoonkyung Lee?
+
+- Bachelor's and Master's in computer science and statistics from Seoul National University
+- Ph.D. in statistic at University of Wisconsin-Madison  
+- Professor of statistic at Ohio State University
+
+<!-- The stuff below between the "div"s will flow over two columns. -->
+<div class="columns-2">
+
+
+```{r yoonkyunglee, out.width = '80%'}
+knitr::include_graphics('https://www.asc.ohio-state.edu/lee.2272/lee.JPG')
+```
+
+>> The main thrust of my research has been to bring statistical perspectives to machine learning methods and advance our understanding of them.
+
+</div>
+
+<!-- Note: the out.height R chunk option sets the height of the rendered figure as a fraction of the slide. You can adjust it to resize the figure to a size that works for you. (Yes, there's an out.width too, but if you set only one, the aspect ratio of the figure will not get messed up!) -->
+
+
+## Contribution to Statistics
+
+Lee has made major contributions to the Stats and Data Science community. She as 25 peer-reviewed papers on multivariate analysis and statistical learning. She's also known for her research on support vector machines which helped to bridge the gap between statistics and computer science.
+
+```{r contrinution, out.width = '50%'}
+knitr::include_graphics('https://pics.me.me/computer-science-mathematics-machine-learning-statistics-what-the-hell-is-65889254.png')
+```
+
+
+## Bright Side & Dark
+- Bright Side
+  - Yoonkyung Lee has taken the knowledge she has learned and has shared it and passed it down to the next generation. 
+  - She has several current and former PhD students
+  - She is a professor at a nearby University and translating her knowledge between statistics, computer science, and engineering
+- Not-so-bright Side
+  - Low social media presence
