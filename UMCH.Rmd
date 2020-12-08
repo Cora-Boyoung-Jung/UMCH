@@ -1,14 +1,6 @@
 ---
 title: "UMCH"
 author: "Cora Boyoung Jung, Enoch Mwesigwa, Jordan Severn"
-date: "`r format(Sys.Date(), "%B %d, %Y")`"
-output:
-  pdf_document:
-    fig_height: 2.2
-    fig_width: 4
-  html_document:
-    fig_height: 2.2
-    fig_width: 4
 ---
 
 
@@ -32,7 +24,7 @@ theme_set(theme_minimal(base_size = 12))
 ## Import csv & Change data type
   
 ```{r}
-UMCHdata <- read_csv("https://raw.githubusercontent.com/Cora-Boyoung-Jung/UMCH/main/data/UMCH.csv",
+UMCHdata <- read_csv("https://raw.githubusercontent.com/Cora-Boyoung-Jung/UMCH/main/data/UMCH_p.csv",
                      col_types = cols(Birthdate = col_date(format = "%m/%d/%Y"),
                                       Age = col_integer()))
 glimpse(UMCHdata)
@@ -47,6 +39,104 @@ UMCH <- arrange(transform(UMCH,
              AgeGroup=factor(AgeGroup,levels=neworder)),AgeGroup)
 ```
 
+## Statistics in Percentage
+```{r, start_stats}
+# group and get median of scores in each age group
+UMCH_grouped <- UMCHdata %>% 
+    select(AgeGroup, PhysicalDevelopment,LanguageDevelopment, Adaptive_SelfHelp,
+           Adaptive_SocialEmotional, AcademicAndCognitive, AcademicAndCognitive_Maths,
+          AcademicAndCognitive_Literacy) %>%
+  group_by(AgeGroup) %>%
+  summarise_each(funs(round(mean(., na.rm = TRUE), digits=2))) 
+
+UMCH_grouped <- arrange(transform(UMCH_grouped,
+             AgeGroup=factor(AgeGroup,levels=neworder)),AgeGroup)
+
+UMCH_grouped%>%
+  knitr::kable()
+```
+
+```{r}
+#make data with max scores
+AgeGroup <- c('infant', 'toddler', 'two_year', 'three_year', 'four_year')
+UMCH_max <-  as.data.frame(rbind(c('infant', 28,44,12, 16, NA, NA, NA),
+                                 c('toddler', 19,59,9, 13, NA, NA, NA),
+                                 c('two_year', 27.5,51,NA, NA, 21.5, NA, NA),
+                                 c('three_year', 31,48,NA, NA, 21, NA, NA),
+                                 c('four_year', 15, 48,NA, NA, 10, 17, 10 )))
+
+#rename columns
+names(UMCH_max)[1] <- "AgeGroup"
+names(UMCH_max)[2] <- "PhysicalDevelopment"
+names(UMCH_max)[3] <- "LanguageDevelopment"
+names(UMCH_max)[4] <- "Adaptive_SelfHelp"
+names(UMCH_max)[5] <- "Adaptive_SocialEmotional"
+names(UMCH_max)[6] <- "AcademicAndCognitive"
+names(UMCH_max)[7] <- "AcademicAndCognitive_Maths"
+names(UMCH_max)[8] <- "AcademicAndCognitive_Literacy"
+
+#convert to characters
+UMCH_max$PhysicalDevelopment <- as.numeric(UMCH_max$PhysicalDevelopment)
+UMCH_max$LanguageDevelopment <- as.numeric(UMCH_max$LanguageDevelopment)
+UMCH_max$Adaptive_SelfHelp <- as.numeric(UMCH_max$Adaptive_SelfHelp)
+UMCH_max$Adaptive_SocialEmotional <- as.numeric(UMCH_max$Adaptive_SocialEmotional)
+UMCH_max$AcademicAndCognitive <-  as.numeric(UMCH_max$AcademicAndCognitive)
+UMCH_max$AcademicAndCognitive_Maths <- as.numeric(UMCH_max$AcademicAndCognitive_Maths)
+UMCH_max$AcademicAndCognitive_Literacy <- as.numeric(UMCH_max$AcademicAndCognitive_Literacy)
+UMCH_max%>%
+  knitr::kable()
+```
+
+```{r, get_percent_func}
+getPercent <- function(list1, list2){
+  newList <- vector(mode = "list", length = 5)
+  for (i in 1:length(list1)) {
+    if(is.na(list1[i]))
+    {
+      newList[[i]] <- NA
+    }
+    else
+    {
+      newList[[i]] <- round( (list1[i] / list2[i] * 100), digits = 2)
+    }
+  }
+  newList
+}
+
+```
+
+```{r, calculate_percent}
+UMCH_percent <- UMCH_grouped %>% 
+    mutate(PhysicalDevelopment= getPercent(UMCH_grouped$PhysicalDevelopment,UMCH_max$PhysicalDevelopment),
+           LanguageDevelopment= getPercent(UMCH_grouped$LanguageDevelopment,UMCH_max$LanguageDevelopment),
+           Adaptive_SelfHelp= getPercent(UMCH_grouped$Adaptive_SelfHelp,UMCH_max$Adaptive_SelfHelp),
+           Adaptive_SocialEmotional= getPercent(UMCH_grouped$Adaptive_SocialEmotional,UMCH_max$Adaptive_SocialEmotional),
+           AcademicAndCognitive= getPercent(UMCH_grouped$AcademicAndCognitive,UMCH_max$AcademicAndCognitive),
+           AcademicAndCognitive_Maths= getPercent(UMCH_grouped$AcademicAndCognitive_Maths,UMCH_max$AcademicAndCognitive_Maths),
+           AcademicAndCognitive_Literacy= getPercent(UMCH_grouped$AcademicAndCognitive_Literacy,UMCH_max$AcademicAndCognitive_Literacy))
+
+reactable(UMCH_percent)
+```
+
+````{r}
+UMCH_percent_long <- UMCH_percent %>%
+  pivot_longer(!AgeGroup, names_to = "Domain", values_to = "Percentage") %>%
+  na.omit()
+
+UMCH_percent_long %>%
+  knitr::kable()
+```
+
+```{r}
+ggplot(UMCH_percent_long, aes(x = AgeGroup,  y = Percentage)) +
+  geom_bar(stat = "identity", width = 0.75, color = "#2b2b2b", size = 0.05 ) + 
+  facet_wrap(~Domain, ncol= 3) +
+  labs(title="Average Percentage Scored of Total Possible Points Grouped by AgeGroup and Domain", y="Percent")  +
+  theme(
+    strip.text.x = element_text(margin = margin(5, 5, 5, 5))
+  )
+
+```
 ## Exploring data set
   
 ```{r}
