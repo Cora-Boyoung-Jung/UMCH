@@ -25,7 +25,7 @@ Questions to answer:
   
 
 Audience:  
-Our audience is Michelle A. Cossar (our project partner) and the other teachers at UMCH. Our goal is to develop some useful graphics and meaningful conclusions all to provide actionable information for our project partner.   
+Our audience is Michelle A. Cossar (our project partner) and the other teachers at UMCH. Our goal is to obtain the statistics on minimum, maximum, mean, and median of each area of development for each age group and to find out using linear regression whether Age and Gender have effect on the Brigrance test score.  
 
 Materials to produce:  
 - Excel file of the data  

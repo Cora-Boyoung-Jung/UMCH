@@ -2,42 +2,119 @@
 title: "UMCH Final Presentation"
 author: "STAT 245 Fall 2020 - Cora Boyoung Jung, Enoch Mwesigwa, Jordan Severn"
 date: "12/15/2020"
-output: slidy_presentation
+output:
+  slidy_presentation
 ---
 
+<body style="font-family: Tahoma; background-color: #7C91C3; color:white;">
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-## UMCH
+## UMCH {.bigger}
 
-- Does talking to an infant about his or her actions affect his or her early language development?
-- Is the impact the same for higher and lower income households? 
-
-## Goals
-- Figure 2 told us that the lower the socioeconomic status is the less expressive vocabulary they have. The higher socioeconomic status is the more expressive vocabulary they have. When a child becomes 15 months old is when their vocabulary will either greatly expand or slightly increase. 
-- Design features that were really good in this figure were the control and intervention lines. You could see the results clearly and how they compared.
-
-```{r turtle-image, out.width = '65%'}
-knitr::include_graphics('https://acamh.onlinelibrary.wiley.com/cms/asset/725a1afa-9bf2-485e-81ba-b6372bc62a30/jcpp12725-fig-0002-m.png')
+```{r umch, out.width = '60%'}
+knitr::include_graphics('presentation/umch.jpg')
 ```
 
-## Data
+>> The UMCH mission is to increase the ability of children, youth, adults and families to succeed in a diverse community. 
 
-- Response variable 
-- Predictors
-- Model type
-- Interaction ?
-- Random effects ?
+- Children Development Center
+- Senior Programming
+- Youth Programming
 
-- Model planning
-- Plots of the data
-- Coefficients, model summary information
-- Model assessment (condition checking)
-- Results of hypothesis testing or model selection
-- Model interpretation - what results mean
-- Prediction plots
+
+## Our Partner {.bigger}
+
+```{r michelle, out.width = '20%'}
+knitr::include_graphics('presentation/michelle.jpg')
+```
+
+Michelle A. Cossar  
+Director of Child Programs
+
+## Children Development Center {.bigger}
+
+– Full / Part-Time Child care  
+– Low child-teachers ratios  
+– Healthy meals and snacks  
+– High Scope Curriculum  
+– Brigance and COR Advantage Developmental Screenings  
+– Gym activities  
+– Outdoor experiences  
+– Family engagement activities  
+– Mindfulness Approach for Self and Classroom Management  
+
+## Goals {.bigger}
+
+- Which domain in the area of development is scored the lowest for each age group?  
+- Which domain in the area of development is scored the highest for each age group?  
+- Which domain in the area of development is scored the highest and the lowest overall?  
+- Do Age and Gender have effect on Brigrance test result of a child?  
+
+## Data: Infant
+
+```{r infant, out.width = '70%'}
+knitr::include_graphics('presentation/infant.PNG')
+```
+
+## Data: Toddler
+
+```{r toddler, out.width = '70%'}
+knitr::include_graphics('presentation/toddler.PNG')
+```
+
+## Data: Two years old
+
+```{r 2, out.width = '70%'}
+knitr::include_graphics('presentation/2.PNG')
+```
+
+## Data: Three years old
+
+```{r 3, out.width = '70%'}
+knitr::include_graphics('presentation/3.PNG')
+```
+
+## Data: Four years old
+
+```{r 4, out.width = '70%'}
+knitr::include_graphics('presentation/4.PNG')
+```
+
+## Data: Excel
+
+```{r excel, out.width = '85%'}
+knitr::include_graphics('presentation/excel.PNG')
+```
+
+## Data: Statistics
+
+```{r stat, out.width = '60%'}
+knitr::include_graphics('presentation/stat.PNG')
+```
+
+## Model {.bigger}
+Response variable: TotalScore  
+Predictor(s): Age, Gender   
+Regression model: Linear regression 
+
+mod_total <- lm(TotalScore ~ Age + Gender,  
+          data = UMCH.clean)  
+summary(mod_total)  
+
+## Conclusions from Model
+```{r model graph}
+knitr::include_graphics('presentation/totalScore_by_AgeGroup_and_Domain-1.png')
+```
+
+```{r predictions}
+knitr::include_graphics('presentation/predictions-1.png')
+```
+
+
+
 
 ## Experience
 
@@ -52,3 +129,5 @@ Notes for perspective:
 
 "If a larger dataset was available, it would be possible to get estimates with less uncertainty and it would be possible to confirm or refute whether there is an overall score difference by gender.  
 It would be interesting to have multiple datapoints for individual child over time, so that we could be able to account for individual differences and perhaps model how scores evolve over time. There are many ways to improve this data analysis and one would be adding more factors such as characteristics of the children, classrooms, socio-economic status, or other demographics like race and ethnicity. With more data, there are definitely more ways to go, more data to explore, more predictions to make, and more conclusion to write."
+
+</body>

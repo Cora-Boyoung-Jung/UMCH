@@ -2,9 +2,9 @@
 title: "UMCH"
 author: "Cora Boyoung Jung, Enoch Mwesigwa, Jordan Severn"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 
 
@@ -22,23 +22,43 @@ knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE,
                       warning=FALSE,
                       fig.width = 10, fig.height = 6)
+knitr::opts_chunk$set(dev = c('png'),
+                      fig.path = 'UMCH-figures/UMCH-')
 
 theme_set(theme_minimal(base_size = 12))
 ```
 
 
 ```{r import-data}
-UMCHdata <- read_csv("https://raw.githubusercontent.com/Cora-Boyoung-Jung/UMCH/main/data/UMCH_p.csv",
+UMCH.raw <- read_csv("https://raw.githubusercontent.com/Cora-Boyoung-Jung/UMCH/main/data/UMCH_p.csv",
                      col_types = cols(Birthdate = col_date(format = "%m/%d/%Y"),
                                       Age = col_integer()))
 ```
 
-```{r tidy-data}
-UMCH <- UMCHdata %>% mutate(Status = tolower(Status))
-neworder <- c("infant","toddler","two_year", "three_year", "four_year")
+```{r}
+UMCH.clean <- UMCH.raw %>% mutate(Status = tolower(Status))
 
-UMCH <- arrange(transform(UMCH,
+v1 <- unlist(UMCH.clean$AgeGroup)
+UMCH.clean$AgeGroup <- relist(replace(v1, v1=="two_year", "2yo"), skeleton=UMCH.clean$AgeGroup)
+
+v1 <- unlist(UMCH.clean$AgeGroup)
+UMCH.clean$AgeGroup <- relist(replace(v1, v1=="three_year", "3yo"), skeleton=UMCH.clean$AgeGroup)
+
+v1 <- unlist(UMCH.clean$AgeGroup)
+UMCH.clean$AgeGroup <- relist(replace(v1, v1=="four_year", "4yo"), skeleton=UMCH.clean$AgeGroup)
+
+neworder <- c("infant","toddler","2yo", "3yo", "4yo")
+
+UMCH.clean <- arrange(transform(UMCH.clean,
              AgeGroup=factor(AgeGroup,levels=neworder)),AgeGroup)
+
+names(UMCH.clean)[13] <- "PhysDev %"
+names(UMCH.clean)[14] <- "LangDev %"
+names(UMCH.clean)[15] <- "AdaptiveSelfHelp %"
+names(UMCH.clean)[16] <- "AdaptiveSocioEmotional %"
+names(UMCH.clean)[17] <- "AcademicCognitive %"
+names(UMCH.clean)[18] <- "AcademicCognitiveMath %"
+names(UMCH.clean)[19] <- "AcademicCognitiveLit %"
 ```
 
 ## Graphics
@@ -46,7 +66,7 @@ UMCH <- arrange(transform(UMCH,
 #### Which domain in the areas of development is scored the lowest and highest in which age group and overall?  
 
 ```{r}
-UMCH_long <- UMCH %>%
+UMCH.long <- UMCH.clean %>%
   subset(select = -c(Filename, Birthdate, Age, Gender, TotalScore, Status, Examiner,Adaptive_SelfHelp, Adaptive_SocialEmotional, LanguageDevelopment,AcademicAndCognitive,PhysicalDevelopment, AcademicAndCognitive_Literacy, AcademicAndCognitive_Maths)) %>%
   pivot_longer(!AgeGroup, names_to = "Domain", values_to = "Score") %>%
   na.omit() %>%
@@ -54,62 +74,38 @@ UMCH_long <- UMCH %>%
          Domain = as.factor(Domain),
          Score = as.numeric(Score))
 
-UMCH_stat <- UMCH_long %>%
+UMCH.stat <- UMCH.long %>%
   dplyr::group_by(AgeGroup,Domain) %>%
   dplyr::summarise(Min=min(Score),
                    Max=max(Score),
-                   Mean=mean(Score),
-                   Median=median(Score))
+                   Mean=round(mean(Score), digits = 2),
+                   Median=round(median(Score), digits = 2))
 
-UMCH_stat %>%
+UMCH.stat %>%
   knitr::kable()
 ```
-```{r max}
-ggplot(UMCH_stat, aes(x = Domain,  y = Max, color=AgeGroup)) +
+```{r}
+UMCH.between <- summarySE(data=UMCH.long, measurevar="Score", groupvars=c("Domain", "AgeGroup"), na.rm=FALSE, conf.interval=.95)
+
+ggplot(UMCH.between, aes(x = Score,  y = Domain, color=AgeGroup)) +
   geom_point() + 
+  geom_errorbar(width=.1, aes(xmin=Score-ci, xmax=Score+ci), colour="red") +
   facet_wrap(~AgeGroup) +
-  labs(title="Maximum Score of Children Grouped by AgeGroup and Domain", y="Score") +
+  labs(title="Percent of total Score of Children Grouped by AgeGroup and Domain", y="Score (%)") +
   theme(legend.position = "none",
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  expand_limits(y = 0)
-```
-```{r min}
-ggplot(UMCH_stat, aes(x = Domain,  y = Min, color=AgeGroup)) +
-  geom_point() + 
-  facet_wrap(~AgeGroup) +
-  labs(title="Minimum Score of Children Grouped by AgeGroup and Domain", y="Score") +
-  theme(legend.position = "none",
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  expand_limits(y = 0)
-```
-```{r mean}
-ggplot(UMCH_stat, aes(x = Domain,  y = Mean, color=AgeGroup)) +
-  geom_point() + 
-  facet_wrap(~AgeGroup) +
-  labs(title="Average Score of Children Grouped by AgeGroup and Domain", y="Score") +
-  theme(legend.position = "none",
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  expand_limits(y = 0)
-```
-```{r median}
-ggplot(UMCH_stat, aes(x = Domain,  y = Median, color=AgeGroup)) +
-  geom_point() + 
-  facet_wrap(~AgeGroup) +
-  labs(title="Median Score of Children Grouped by AgeGroup and Domain", y="Score") +
-  theme(legend.position = "none",
-        axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-  expand_limits(y = 0)
+        axis.text.x = element_text(angle = 0, vjust = 0.5, hjust=1)) +
+  expand_limits(y = 0) 
 ```
 
 ### How does score vary by age group?  
 ```{r totalscore-by-agegroup}
-gf_histogram(~TotalScore, data=UMCH, fill='#00BFC4', color='black') %>% 
+gf_histogram(~TotalScore, data=UMCH.clean, fill='#00BFC4', color='black') %>% 
   gf_labs(title="Total Scores by Age Group", x="Total Score", y="Counts") + facet_wrap(~AgeGroup)
 ```
 
 ### How does score vary by gender?  
 ```{r totalscore-by-gender-and-agegroup}
-ggplot(UMCH, aes(x = Gender,  y = TotalScore, fill=Gender)) +
+ggplot(UMCH.clean, aes(x = Gender,  y = TotalScore, fill=Gender)) +
   geom_boxplot() + 
   facet_wrap(~AgeGroup) +
   labs(title="Total Scores by Gender for Each AgeGroup", x="Gender") +
@@ -118,33 +114,48 @@ ggplot(UMCH, aes(x = Gender,  y = TotalScore, fill=Gender)) +
 
 ## TotalScore Model
 
-We used linear regression model because it is used to show/predict the relationship between variables where the response variable is continuous. We can use up to 2 predictors given the size of the data (36/15). We will not add any interaction or random effect due to the size of the dataset. Our predictors will be Age and Gender because all other variables contributes to the Total Score which does not make logical sense to include those.     
-Response variable: TotalScore 
-Predictor(s): Age, Gender   
-Regression model: Linear regression 
+A linear regression is the method of using observations (data records) to model the relationship between a target variable (a field in the record set) which is a dependent variable and a set of independent variables. In this case, the variable "TotalScore" is the target variable and "Gender" and "Age" are the independent variables.  
+So, we will be using the linear relationship between the "TotalScore" and "Age" by "Gender" to predict the "TotalScore" for a given value of "Age" by "Gender".  
 
 ```{r}
 mod_total <- lm(TotalScore ~ Age + Gender,  
-          data = UMCH)  
+          data = UMCH.clean)  
 ```
 
 ## Prediction Plot
 
-```{r pred-plot-age}
-pred_plot(mod_total, 'Age') %>%
-  gf_labs(y = 'Predicted Score',
-          title = 'Prediction Plot on Age')
+```{r predictions}
+# make hypothetical data
+gender_pred_data <- expand.grid(Age = seq(from = 0, by = 1, to = 4), 
+                                Gender = pull(UMCH.clean, Gender) %>% factor() %>% levels())
+
+# make predictions with SEs
+preds <- predict(mod_total,
+                 type = 'response',
+                 se.fit = TRUE,
+                 newdata = gender_pred_data)
+
+# put predictions and CI bounds in data set
+gender_pred_data <- gender_pred_data %>%
+  mutate(fitted = preds$fit,
+         CI_low = fitted - 1.96 * preds$se.fit,
+         CI_high = fitted + 1.96 * preds$se.fit)
+
+# make a graph
+gf_line(fitted ~ Age,
+         color = ~Gender,
+         data = gender_pred_data) %>%
+  gf_labs(x = 'Age', y = 'Predicted Total Score') %>%
+  gf_ribbon(CI_low + CI_high ~ Age,
+            fill = ~Gender,
+            color = ~Gender)
 ```
 
-```{r pred-plot-gender}
-pred_plot(mod_total, 'Gender') %>%
-  gf_labs(y = 'Predicted Score',
-          title = 'Prediction Plot on Gender')
-```
+According to this plot predicting the "TotalScore" with "Age" by "Gender" with our dataset, there seems to be a positive trend between the score and age where as age increases, the score also increases. This makes sense because the "pass" score for each age group differs according to the age with lower age having the lowest pass score. Also, it looks like the total score is a little higher for female compared to male. However, the overlapping range is high and the number of children is not the same (21 females and 15 males).  
 
-According to the prediction plot for Age, there seems to be a positive trend between the score and age where as age increases, the score also increases. This makes sense because the "pass" score for each age group differs according to the age with lower age having the lowest pass score.  
-According to the prediction plot for Gender, it looks like the total score is a little higher for female compared to male. However, the overlapping range is high and the number of children is not the same (21 females and 15 males), so it brings down the reliability score of this data but it is worth noting.  
+If a larger dataset was available, it would be possible to get estimates with less uncertainty and it would be possible to confirm or refute whether there is an overall score difference by gender.  
 
+It would be interesting to have multiple datapoints for individual child over time, so that we could be able to account for individual differences and perhaps model how scores evolve over time. There are many ways to improve this data analysis and one would be adding more factors such as characteristics of the children, classrooms, socio-economic status, or other demographics like race and ethnicity. With more data, there are definitely more ways to go, more data to explore, more predictions to make, and more conclusion to write.  
 
 
 
