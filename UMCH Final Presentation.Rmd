@@ -1,0 +1,54 @@
+---
+title: "UMCH Final Presentation"
+author: "STAT 245 Fall 2020 - Cora Boyoung Jung, Enoch Mwesigwa, Jordan Severn"
+date: "12/15/2020"
+output: slidy_presentation
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## UMCH
+
+- Does talking to an infant about his or her actions affect his or her early language development?
+- Is the impact the same for higher and lower income households? 
+
+## Goals
+- Figure 2 told us that the lower the socioeconomic status is the less expressive vocabulary they have. The higher socioeconomic status is the more expressive vocabulary they have. When a child becomes 15 months old is when their vocabulary will either greatly expand or slightly increase. 
+- Design features that were really good in this figure were the control and intervention lines. You could see the results clearly and how they compared.
+
+```{r turtle-image, out.width = '65%'}
+knitr::include_graphics('https://acamh.onlinelibrary.wiley.com/cms/asset/725a1afa-9bf2-485e-81ba-b6372bc62a30/jcpp12725-fig-0002-m.png')
+```
+
+## Data
+
+- Response variable 
+- Predictors
+- Model type
+- Interaction ?
+- Random effects ?
+
+- Model planning
+- Plots of the data
+- Coefficients, model summary information
+- Model assessment (condition checking)
+- Results of hypothesis testing or model selection
+- Model interpretation - what results mean
+- Prediction plots
+
+## Experience
+
+What was the experience of working with your group/partner like? What were strengths and weaknesses, joys or challenges? What would you recommend/not to future groups; what lessons are learned? Can you suggest structural changes to the class/projects that could help?
+
+
+## Perspective
+
+What would you love to do if you got to keep working on this dataset? What mysteries remain, or what additional data would be enlightening? Do you think your results will aid and inform your partner’s work going forward? How so?
+
+Notes for perspective:
+
+"If a larger dataset was available, it would be possible to get estimates with less uncertainty and it would be possible to confirm or refute whether there is an overall score difference by gender.  
+It would be interesting to have multiple datapoints for individual child over time, so that we could be able to account for individual differences and perhaps model how scores evolve over time. There are many ways to improve this data analysis and one would be adding more factors such as characteristics of the children, classrooms, socio-economic status, or other demographics like race and ethnicity. With more data, there are definitely more ways to go, more data to explore, more predictions to make, and more conclusion to write."
